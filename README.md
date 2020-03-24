@@ -1,5 +1,5 @@
 # COVID-19 public dataset on GCP from cases in Italy
-> by Italian Society of Medical and Interventional Radiology (ISMIR)
+> by the Italian Society of Medical and Interventional Radiology (ISMIR)
 
 This repository contains all the code required to extract relevant information from pdf documents published by ISMIR and store raw data in  a relational database and entities in a No-SQL database.
 
@@ -11,7 +11,7 @@ Looking for more context behind this dataset? Check out this article.
 
 ## Installation
 **Requirements:**
-- Clone this repo to your local machine using https://github.com/
+- Clone this repo to your local machine using https://github.com/azizketari/covid19_ISMIR.git
 - You need a Google Cloud project and IAM rights to create service accounts.
 - Enable APIs
 ```
@@ -73,20 +73,22 @@ Last but not least, you can query your databases using this script.
     - 🍴 Fork this repo!    
 
 - **Option 2**
-    - 👯 Clone this repo to your local machine using https://github.com/joanaz/HireDot2.git
+    - 👯 Clone this repo to your local machine using https://github.com/azizketari/covid19_ISMIR.git
     
 ### Step 2
 - **HACK AWAY!** 🔨🔨🔨
 
 ### Step 3
-- 🔃 Create a new pull request using https://github.com/joanaz/HireDot2/compare/.
+- 🔃 Create a new pull request
 
 ---
 
-### Citing
+## Citing
 
 - [ScispaCy: Fast and Robust Models for Biomedical Natural Language Processing by Mark Neumann and Daniel King and Iz Beltagy and Waleed Ammar
   (2019)](https://www.semanticscholar.org/paper/ScispaCy%3A-Fast-and-Robust-Models-for-Biomedical-Neumann-King/de28ec1d7bd38c8fc4e8ac59b6133800818b4e29)
+  
+---
   
 ## License
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
