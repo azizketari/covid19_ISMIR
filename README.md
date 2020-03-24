@@ -39,7 +39,7 @@ gcloud services enable bigquery.googleapis.com
 Note:
 
 You will also need to download a NER model for the second part of this pipeline. See Scispacy full selection of 
-available models [here]('https://github.com/allenai/scispacy'). If you follow this installation guide, the steps 
+available models [here](https://allenai.github.io/scispacy/). If you follow this installation guide, the steps 
 will automatically download a model for you and install it.
 
 
