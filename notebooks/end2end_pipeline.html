@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>ETL</title>
+<title>end2end_pipeline</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13110,10 +13110,8 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>References:</p>
-<ul>
-<li>ScispaCy: Fast and Robust Models for Biomedical Natural Language Processing</li>
-</ul>
+<p><strong>Note:</strong></p>
+<p>This notebook was ran on AI Platform Notebook instance.If you are running this notebook on your local machine, you need to provide the service account credentials in order to authenticate when making the API calls.</p>
 
 </div>
 </div>
@@ -13123,8 +13121,14 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">project_id</span> <span class="o">=</span> <span class="s2">&quot;pm-preparation&quot;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: replace with your settings</span>
+<span class="n">project_id</span> <span class="o">=</span> <span class="s2">&quot;your_project_id&quot;</span>
 <span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;us-central1&quot;</span>
+<span class="n">bucket_name</span> <span class="o">=</span> <span class="s1">&#39;bucket_name&#39;</span>
+<span class="n">bq_dataset_name</span> <span class="o">=</span> <span class="s1">&#39;name_of_your_choice&#39;</span>
+<span class="n">bq_table_name</span> <span class="o">=</span> <span class="s1">&#39;name_of_your_choice_2&#39;</span>
+
+
 <span class="n">storage_client</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 <span class="n">vision_client</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">ImageAnnotatorClient</span><span class="p">()</span>
 <span class="n">translate_client</span> <span class="o">=</span> <span class="n">translate</span><span class="o">.</span><span class="n">TranslationServiceClient</span><span class="p">()</span>
@@ -13300,14 +13304,6 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>This step will take 1hr and 20 min approx</strong></p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
@@ -13336,8 +13332,6 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Process documents</span>
-
-<span class="n">bucket_name</span> <span class="o">=</span> <span class="s1">&#39;covid19-public-dataset-aketari&#39;</span>
 <span class="n">gcs_source_prefix</span> <span class="o">=</span> <span class="s1">&#39;pdf&#39;</span>
 <span class="n">lst_pdf_blobs</span> <span class="o">=</span> <span class="n">storage_client</span><span class="o">.</span><span class="n">list_blobs</span><span class="p">(</span><span class="n">bucket_or_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> 
                                       <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
@@ -13744,10 +13738,9 @@ case9 processing is done.
 <div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bucket_name</span> <span class="o">=</span> <span class="s1">&#39;covid19-public-dataset-aketari&#39;</span>
-<span class="n">gcs_source_prefix</span> <span class="o">=</span> <span class="s1">&#39;raw_txt&#39;</span>
-<span class="n">dataset_id</span> <span class="o">=</span> <span class="n">bqCreateDataset</span><span class="p">(</span><span class="s1">&#39;covid19&#39;</span><span class="p">)</span>
-<span class="n">table_id</span> <span class="o">=</span> <span class="n">bqCreateTable</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="s1">&#39;ISMIR_cases&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gcs_source_prefix</span> <span class="o">=</span> <span class="s1">&#39;raw_txt&#39;</span>
+<span class="n">dataset_id</span> <span class="o">=</span> <span class="n">bqCreateDataset</span><span class="p">(</span><span class="n">bq_dataset_name</span><span class="p">)</span>
+<span class="n">table_id</span> <span class="o">=</span> <span class="n">bqCreateTable</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">bq_table_name</span><span class="p">)</span>
 
 <span class="n">lst_blobs</span> <span class="o">=</span> <span class="n">storage_client</span><span class="o">.</span><span class="n">list_blobs</span><span class="p">(</span><span class="n">bucket_or_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> 
                                       <span class="n">prefix</span><span class="o">=</span><span class="n">gcs_source_prefix</span><span class="p">)</span>
@@ -13940,10 +13933,8 @@ case9 was added to covid19 dataset, specifically in ISMIR_cases table.
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># https://www.kdnuggets.com/2019/04/text-preprocessing-nlp-machine-learning.html</span>
-<span class="c1"># Load model</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load model</span>
 <span class="c1"># en_ner_bionlp13cg_md or en_core_sci_lg</span>
-<span class="c1">#nlp = spacy.load(&quot;en_core_sci_lg&quot;)</span>
 
 <span class="n">nlp</span> <span class="o">=</span> <span class="n">en_core_sci_lg</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
@@ -14032,24 +14023,10 @@ case9 was added to covid19 dataset, specifically in ISMIR_cases table.
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 <div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># list of blobs</span>
-<span class="n">bucket_name</span> <span class="o">=</span> <span class="s1">&#39;covid19-public-dataset-aketari&#39;</span>
 <span class="n">gcs_source_prefix</span> <span class="o">=</span> <span class="s1">&#39;curated_eng_txt&#39;</span>
 <span class="n">lst_blobs</span> <span class="o">=</span> <span class="n">storage_client</span><span class="o">.</span><span class="n">list_blobs</span><span class="p">(</span><span class="n">bucket_or_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> 
                                       <span class="n">prefix</span><span class="o">=</span><span class="n">gcs_source_prefix</span><span class="p">)</span>
@@ -14328,6 +14305,18 @@ The upload of case9 entities is done.
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+<p>References:</p>
+<ul>
+<li><a href="https://arxiv.org/abs/1902.07669">ScispaCy: Fast and Robust Models for Biomedical Natural Language Processing</a></li>
+</ul>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
