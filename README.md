@@ -46,7 +46,7 @@ will automatically download a model for you and install it.
 ## Extracting data
 - **Step 0:** Navigate to the cloned repo on your local machine
  
-`cd ~/covid19`
+`cd ~/covid19_ISMIR`
 
 - **Step 1:** Modify the values to each variables in env_variables.sh file then run
 
