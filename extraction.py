@@ -60,4 +60,4 @@ for blob in lst_json_blobs:
 
 total_time = time.time() - start_time
 logging.info(
-    'Vision API successfully completed the OCR of all {} documents on {} minutes'.format(round(total_time / 60, 1)))
+    'Successful parsing of all {} documents resulting from Vision API on {} minutes'.format(round(total_time / 60, 1)))

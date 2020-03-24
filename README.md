@@ -1,11 +1,15 @@
 # COVID-19 public dataset on GCP from cases in Italy
 > by the Italian Society of Medical and Interventional Radiology (ISMIR)
 
-This repository contains all the code required to extract relevant information from pdf documents published by ISMIR and store raw data in  a relational database and entities in a No-SQL database.
+This repository contains all the code required to extract relevant information from pdf documents published by ISMIR 
+and store raw data in  a relational database and entities in a No-SQL database.
 
-In particular, you will use Google Cloud Vision API and Translation API, before storing the information on BigQuery. Separately, you will also use specific NER models (from Scispacy) to extract (medical) domain specific entities and store them in a NoSQL db (namely Datastore) on Google Cloud Platform.
+In particular, you will use Google Cloud Vision API and Translation API, before storing the information on BigQuery. 
+Separately, you will also use specific NER models (from Scispacy) to extract (medical) domain specific entities and 
+store them in a NoSQL db (namely Datastore) on Google Cloud Platform.
 
-**Looking for more context behind this dataset? Check out this [article](https://github.com/azizketari/covid19_ISMIR/blob/master/storing.py).**
+**Looking for more context behind this dataset? Check out this 
+[article](https://medium.com/@ak3776/covid-19-public-dataset-on-gcp-from-cases-in-italy-193e628fa5cb).**
 
 Quick sneak peak on the Entity dataset on Datastore:
 ![](./data/gifs/datastore_snapshot.gif)
@@ -31,18 +35,24 @@ gcloud services enable bigquery.googleapis.com
 
 Note:
 
-You will also need to download a NER model for the second part of this pipeline. See Scispacy full selection of available models [here]('https://github.com/allenai/scispacy'). If you follow this installation guide, the steps will automatically download a model for you and install it.
+You will also need to download a NER model for the second part of this pipeline. See Scispacy full selection of 
+available models [here]('https://github.com/allenai/scispacy'). If you follow this installation guide, the steps 
+will automatically download a model for you and install it.
 
 
 ## Extracting data
-- **Step 1:** Assign the values to each variables in env_variables.sh file
+- **Step 0:** Navigate to the cloned repo on your local machine
+ 
+`cd ~/covid19`
+
+- **Step 1:** Modify the values to each variables in env_variables.sh file then run
 
 ```
-cd ~/covid19
 ./env_variables.sh
 ```
 
-- **Step 2:** Download the required files to your bucket and load the required model in your local  (this step will take ~10 min)
+- **Step 2:** Download the required files to your bucket and load the required model in your local  
+(this step will take ~10 min)
 
 ```
 sh ~/data/download_content.sh
@@ -59,7 +69,9 @@ Following the extraction of text, it's time to translate it from Italian to Engl
 `python3 preprocessing.py`
 
 ## Storing data
-Following the pre-processing, it's time to store the data in a more searchable format: a data warehouse - [BigQuery](https://cloud.google.com/bigquery) - for the text, and a No-SQL database - [Datastore](https://cloud.google.com/datastore) - for the (UMLS) medical entities. 
+Following the pre-processing, it's time to store the data in a more searchable format: a data warehouse - 
+[BigQuery](https://cloud.google.com/bigquery) - for the text, and a No-SQL database - 
+[Datastore](https://cloud.google.com/datastore) - for the (UMLS) medical entities. 
 
 `python3 storing.py`
 
@@ -88,8 +100,8 @@ Last but not least, you can query your databases using this script.
 
 ## Citing
 
-- [ScispaCy: Fast and Robust Models for Biomedical Natural Language Processing by Mark Neumann and Daniel King and Iz Beltagy and Waleed Ammar
-  (2019)](https://www.semanticscholar.org/paper/ScispaCy%3A-Fast-and-Robust-Models-for-Biomedical-Neumann-King/de28ec1d7bd38c8fc4e8ac59b6133800818b4e29)
+- [ScispaCy: Fast and Robust Models for Biomedical Natural Language Processing by Mark Neumann and Daniel King and 
+Iz Beltagy and Waleed Ammar (2019)](https://www.semanticscholar.org/paper/ScispaCy%3A-Fast-and-Robust-Models-for-Biomedical-Neumann-King/de28ec1d7bd38c8fc4e8ac59b6133800818b4e29)
   
 ---
   

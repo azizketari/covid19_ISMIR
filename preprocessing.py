@@ -80,9 +80,9 @@ for blob in lst_json_blobs:
 
     # Upload raw text to GCS
     upload_blob(refined_doc, processed_eng_gcs_dest_path)
-    logging.info("The curation of text in {} completed successfully.".format(doc_title))
+    logging.info("The curation of {} text completed successfully.".format(doc_title))
 
 total_time = time.time() - start_time
-logging.info('The translation and curation of all documents was completed successfully in {} minutes.'.format(
+logging.info('The translation and curation of all documents was successfully completed in {} minutes.'.format(
     round(total_time / 60, 1)))
 
