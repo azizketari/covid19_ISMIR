@@ -11,8 +11,11 @@ store them in a NoSQL db (namely Datastore) on Google Cloud Platform.
 **Looking for more context behind this dataset? Check out this 
 [article](https://medium.com/@ak3776/covid-19-public-dataset-on-gcp-from-cases-in-italy-193e628fa5cb).**
 
+Google Cloud Architecture of the pipeline in batch mode (Streaming mode coming soon ...):
+![](./data/images/covid19_repo_architecture_3_24_2020)
+
 Quick sneak peak on the Entity dataset on Datastore:
-![](./data/gifs/datastore_snapshot.gif)
+![](./data/images/datastore_snapshot.gif)
 
 ---
 
