@@ -3,9 +3,12 @@
 
 This repository contains all the code required to extract relevant information from pdf documents published by ISMIR and store raw data in  a relational database and entities in a No-SQL database.
 
-In particular, you will use Google Cloud Vision API and Translation API, before storing the information on BigQuery API. Separately, you will also use specific NER models (from Scispacy) to extract (medical) domain specific entities and store them in a NoSQL db (namely Datastore) on Google Cloud Platform.
+In particular, you will use Google Cloud Vision API and Translation API, before storing the information on BigQuery. Separately, you will also use specific NER models (from Scispacy) to extract (medical) domain specific entities and store them in a NoSQL db (namely Datastore) on Google Cloud Platform.
 
 **Looking for more context behind this dataset? Check out this [article](https://github.com/azizketari/covid19_ISMIR/blob/master/storing.py).**
+
+Quick sneak peak on the Entity dataset on Datastore:
+![](./data/gifs/datastore_snapshot.gif)
 
 ---
 
