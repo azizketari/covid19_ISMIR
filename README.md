@@ -25,9 +25,15 @@ You can replicate this pipeline directly on your local machine or on the cloud s
 **Requirements:**
 - Clone this repo to your local machine using https://github.com/azizketari/covid19_ISMIR.git
 - You need a Google Cloud project and IAM rights to create service accounts.
+- Create and Download the json key associated with your Service Account. Useful [link](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-python)
+- Modify the values to each variables in env_variables.sh file then run
+```
+source env_variables.sh
+```
+
 - Set the project that you will be working on:
 
-`gcloud config set project PROJECT_ID`
+`gcloud config set project $PROJECT_ID`
 
 - Enable APIs:
 ```
@@ -44,23 +50,16 @@ cd ~/covid19_ISMIR
 pip3 install --user -r requirements.txt
 ```
 
-
 Note:
 
-You will also need to download a NER model for the second part of this pipeline. See Scispacy full selection of 
+You will also need to download a Named Entity Recognition model for the second part of this pipeline. See Scispacy full selection of 
 available models [here](https://allenai.github.io/scispacy/). If you follow this installation guide, the steps 
 will automatically download a model for you and install it.
 
 
 ## Extracting data
 
-- **Step 1:** Modify the values to each variables in env_variables.sh file then run
-> Assumption: You have already created/downloaded the json key to your Google Cloud Service Account. Useful [link](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-python)
-```
-source env_variables.sh
-```
-
-- **Step 2:** Download the required files to your bucket and load the required model in your local  
+- **Step 1:** Download the required files to your bucket and load the required model in your local  
 (this step will take ~10 min)
 > Optional: If you have already downloaded the scispacy model, you should modify the file ./content/download_content.sh to not repeat that step
 ```
@@ -68,7 +67,7 @@ source ./content/download_content.sh
 pip install -U ./scispacy_models/en_core_sci_lg-0.2.4.tar.gz
 ```
 
-- **Step 3:** Start the extraction of text from the pdf documents  
+- **Step 2:** Start the extraction of text from the pdf documents  
 
 `python3 ./scripts/extraction.py`
 

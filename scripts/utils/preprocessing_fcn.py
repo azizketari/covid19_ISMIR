@@ -1,27 +1,27 @@
 from google.cloud import storage, translate, vision
-from google.oauth2 import service_account
+#from google.oauth2 import service_account
 import logging
 import os
 
 from google.protobuf import json_format
 
 # DEVELOPER: change path to key
-project_id = os.getenv('PROJECT_ID')
-bucket_name = os.getenv('BUCKET_NAME')
-location = os.getenv('LOCATION')
-key_path = os.getenv('SA_KEY_PATH')
+# project_id = os.getenv('PROJECT_ID')
+# bucket_name = os.getenv('BUCKET_NAME')
+# location = os.getenv('LOCATION')
+# key_path = os.getenv('SA_KEY_PATH')
 
 # DEVELOPER: change path to key
-credentials = service_account.Credentials.from_service_account_file(key_path)
-
-storage_client = storage.Client(credentials=credentials,
-                                project_id=credentials.project_id)
-
-translate_client = translate.Client(credentials=credentials,
-                                    project_id=credentials.project_id)
-
-vision_client = vision.Client(credentials=credentials,
-                              project_id=credentials.project_id)
+# credentials = service_account.Credentials.from_service_account_file(key_path)
+#
+# storage_client = storage.Client(credentials=credentials,
+#                                 project_id=credentials.project_id)
+#
+# translate_client = translate.Client(credentials=credentials,
+#                                     project_id=credentials.project_id)
+#
+# vision_client = vision.Client(credentials=credentials,
+#                               project_id=credentials.project_id)
 
 
 def async_detect_document(vision_client, gcs_source_uri, gcs_destination_uri, batch_size=20):
