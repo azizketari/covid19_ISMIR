@@ -101,7 +101,7 @@ for blob in lst_curated_blobs:
     entities = list(UMLS_tuis_entity.keys())
     TUIs = list(UMLS_tuis_entity.values())
     df_entities = pd.DataFrame(data={'entity': entities, 'TUIs': TUIs})
-    df_reference_TUIs = pd.read_csv('~/data/UMLS_tuis.csv')
+    df_reference_TUIs = pd.read_csv('./utils/UMLS_tuis.csv')
     df_annotated_text_entities = pd.merge(df_entities, df_reference_TUIs, how='inner', on=['TUIs'])
 
     # Upload entities to datastore
