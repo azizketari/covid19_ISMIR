@@ -65,7 +65,7 @@ def async_detect_document(vision_client, gcs_source_uri, gcs_destination_uri, ba
     logging.info('Text extraction from document {} is completed.'.format(doc_title))
 
 
-def read_json_result(bucket_name, doc_title):
+def read_json_result(bucket_name, doc_title, storage_client):
     """
     Parsing the json files and extract text.
     Args:
@@ -75,11 +75,11 @@ def read_json_result(bucket_name, doc_title):
     Returns:
         all_text: str - Containing all text of the document
     """
-    gcs_destination_prefix = 'json/' + '{}-'.format(doc_title)
+    gcs_src_prefix = 'json/' + '{}-'.format(doc_title)
 
     # List objects with the given prefix.
     blob_list = list(storage_client.list_blobs(bucket_or_name=bucket_name,
-                                               prefix=gcs_destination_prefix))
+                                               prefix=gcs_src_prefix))
     all_text = ''
     for blob in blob_list:
 
@@ -98,7 +98,7 @@ def read_json_result(bucket_name, doc_title):
     return all_text
 
 
-def upload_blob(bucket_name, txt_content, destination_blob_name):
+def upload_blob(storage_client, bucket_name, txt_content, destination_blob_name):
     """
     Uploads a file to the bucket.
     Args:
