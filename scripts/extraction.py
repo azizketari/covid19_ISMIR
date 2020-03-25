@@ -13,11 +13,9 @@ key_path = os.getenv('SA_KEY_PATH')
 
 credentials = service_account.Credentials.from_service_account_file(key_path)
 
-storage_client = storage.Client(credentials=credentials,
-                                project_id=project_id)
+storage_client = storage.Client(credentials=credentials)
 
-vision_client = vision.Client(credentials=credentials,
-                              project_id=project_id)
+vision_client = vision.ImageAnnotatorClient(credentials=credentials)
 
 lst_pdf_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
                                           prefix='pdf')

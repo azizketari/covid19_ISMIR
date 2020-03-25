@@ -5,12 +5,9 @@ from utils.ner_fcn import loadModel, addTask, extractMedEntities
 import en_core_sci_lg
 
 import logging
-import re
 import time
 import os
 import pandas as pd
-import sys
-import argparse
 
 project_id = os.getenv('PROJECT_ID')
 bucket_name = os.getenv('BUCKET_NAME')
@@ -21,11 +18,9 @@ table_name = os.getenv('BQ_TABLE_NAME')
 
 credentials = service_account.Credentials.from_service_account_file(key_path)
 
-storage_client = storage.Client(credentials=credentials,
-                                project_id=project_id)
+storage_client = storage.Client(credentials=credentials)
 
-datastore_client = datastore.Client(credentials=credentials,
-                                    project_id=project_id)
+datastore_client = datastore.Client(credentials=credentials)
 
 gcs_source_prefix = 'raw_txt'
 lst_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,

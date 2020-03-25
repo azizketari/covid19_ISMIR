@@ -16,11 +16,9 @@ case_id = os.getenv('TEST_CASE')
 
 credentials = service_account.Credentials.from_service_account_file(key_path)
 
-bq_client = bigquery.Client(credentials=credentials,
-                            project_id=project_id)
+bq_client = bigquery.Client(credentials=credentials)
 
-datastore_client = datastore.Client(credentials=credentials,
-                                    project_id=project_id)
+datastore_client = datastore.Client(credentials=credentials)
 
 # Returns a list of results
 try:

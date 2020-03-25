@@ -1,4 +1,4 @@
-from google.cloud import storage
+from google.cloud import storage, translate
 from google.oauth2 import service_account
 from utils.preprocessing_fcn import batch_translate_text, upload_blob
 import logging
@@ -14,8 +14,9 @@ key_path = os.getenv('SA_KEY_PATH')
 
 credentials = service_account.Credentials.from_service_account_file(key_path)
 
-storage_client = storage.Client(credentials=credentials,
-                                project_id=project_id)
+storage_client = storage.Client(credentials=credentials)
+
+translate_client = translate.TranslationServiceClient(credentials=credentials)
 
 lst_json_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
                                            prefix='json')

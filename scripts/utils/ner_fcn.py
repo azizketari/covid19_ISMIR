@@ -10,15 +10,15 @@ from scispacy.abbreviation import AbbreviationDetector
 
 
 # DEVELOPER: change path to key
-project_id = os.getenv('PROJECT_ID')
-bucket_name = os.getenv('BUCKET_NAME')
-location = os.getenv('LOCATION')
-key_path = os.getenv('SA_KEY_PATH')
+# project_id = os.getenv('PROJECT_ID')
+# bucket_name = os.getenv('BUCKET_NAME')
+# location = os.getenv('LOCATION')
+# key_path = os.getenv('SA_KEY_PATH')
 
-credentials = service_account.Credentials.from_service_account_file(key_path)
-
-datastore_client = datastore.Client(credentials=credentials,
-                                    project_id=credentials.project_id)
+# credentials = service_account.Credentials.from_service_account_file(key_path)
+#
+# datastore_client = datastore.Client(credentials=credentials,
+#                                     project_id=credentials.project_id)
 
 
 def loadModel(model=en_core_sci_lg):

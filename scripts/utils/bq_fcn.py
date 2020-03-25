@@ -3,15 +3,15 @@ from google.oauth2 import service_account
 import logging
 import os
 
-project_id = os.getenv('PROJECT_ID')
-bucket_name = os.getenv('BUCKET_NAME')
-location = os.getenv('LOCATION')
-key_path = os.getenv('SA_KEY_PATH')
-
-credentials = service_account.Credentials.from_service_account_file(key_path)
-
-bq_client = bigquery.Client(credentials=credentials,
-                            project_id=project_id)
+# project_id = os.getenv('PROJECT_ID')
+# bucket_name = os.getenv('BUCKET_NAME')
+# location = os.getenv('LOCATION')
+# key_path = os.getenv('SA_KEY_PATH')
+#
+# credentials = service_account.Credentials.from_service_account_file(key_path)
+#
+# bq_client = bigquery.Client(credentials=credentials,
+#                             project_id=project_id)
 
 
 def bqCreateDataset(dataset_name):
