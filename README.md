@@ -20,10 +20,16 @@ Quick sneak peak on the Entity dataset on Datastore:
 ---
 
 ## Installation
+You can replicate this pipeline directly on your local machine or on the cloud shell on GCP.
+ 
 **Requirements:**
 - Clone this repo to your local machine using https://github.com/azizketari/covid19_ISMIR.git
 - You need a Google Cloud project and IAM rights to create service accounts.
-- Enable APIs
+- Set the project that you will be working on:
+
+`gcloud config set project PROJECT_ID`
+
+- Enable APIs:
 ```
 gcloud services enable vision.googleapis.com
 gcloud services enable translate.googleapis.com
@@ -32,8 +38,11 @@ gcloud services enable bigquery.googleapis.com
 ```
 
 - Install package requirements:
-
-```pip install -r requirements.txt```
+ 
+```
+cd ~/covid19_ISMIR
+pip3 install --user -r requirements.txt
+```
 
 
 Note:
@@ -44,21 +53,18 @@ will automatically download a model for you and install it.
 
 
 ## Extracting data
-- **Step 0:** Navigate to the cloned repo on your local machine
- 
-`cd ~/covid19_ISMIR`
 
 - **Step 1:** Modify the values to each variables in env_variables.sh file then run
 > Assumption: You have already created/downloaded the json key to your Google Cloud Service Account. Useful [link](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-python)
 ```
-./env_variables.sh
+source env_variables.sh
 ```
 
 - **Step 2:** Download the required files to your bucket and load the required model in your local  
 (this step will take ~10 min)
 > Optional: If you have already downloaded the scispacy model, you should modify the file ./content/download_content.sh to not repeat that step
 ```
-sh ~/content/download_content.sh
+source ./content/download_content.sh
 pip install -U ./scispacy_models/en_core_sci_lg-0.2.4.tar.gz
 ```
 
