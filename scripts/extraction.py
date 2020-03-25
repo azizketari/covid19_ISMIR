@@ -3,6 +3,8 @@ from google.oauth2 import service_account
 from utils.preprocessing_fcn import async_detect_document, read_json_result, upload_blob
 
 import logging
+logging.getLogger().setLevel(logging.INFO)
+
 import time
 import os
 
@@ -24,34 +26,31 @@ lst_json_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
                                            prefix='json')
 
 start_time = time.time()
-nbr_documents = len(lst_pdf_blobs)
 for blob in lst_pdf_blobs:
     doc_title = blob.name.split('/')[-1].split('.pdf')[0]
 
     # Generate all paths
     gcs_source_path = 'gs://' + bucket_name + '/' + blob.name
-    json_gcs_dest_path = 'gs://' + bucket_name + '/json/' + blob.name
+    json_gcs_dest_path = 'gs://' + bucket_name + '/json/' + doc_title
 
     # OCR pdf documents
     async_detect_document(vision_client,
                           gcs_source_path,
                           json_gcs_dest_path)
-
 total_time = time.time() - start_time
-logging.info("Vision API successfully completed OCR of all {} documents on {} minutes".format(nbr_documents,
-                                                                                              round(total_time / 60,
-                                                                                                    1)))
+logging.info("Vision API successfully completed OCR of all {} documents on {} minutes".format(round(total_time / 60,1)))
 
+# Extracting the text now
 start_time = time.time()
 for blob in lst_json_blobs:
     doc_title = blob.name.split('/')[-1].split('-')[0]
 
     # Define GCS paths
-    json_gcs_dest_path = 'gs://' + bucket_name + '/{}'.format(blob.name)
+    #json_gcs_dest_path = 'gs://' + bucket_name + '/{}'.format(blob.name)
     txt_gcs_dest_path = 'gs://' + bucket_name + '/raw_txt/' + doc_title + '.txt'
 
     # Parse json
-    all_text = read_json_result(json_gcs_dest_path, doc_title)
+    all_text = read_json_result(bucket_name=bucket_name, doc_title=doc_title)
 
     # Upload raw text to GCS
     upload_blob(all_text, txt_gcs_dest_path)
