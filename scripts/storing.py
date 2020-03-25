@@ -1,7 +1,7 @@
 from google.cloud import storage, bigquery, datastore
 from google.oauth2 import service_account
-from utils.bq_fcn import bqCreateDataset, bqCreateTable, exportItems2BQ
-from utils.ner_fcn import loadModel, addTask, extractMedEntities
+from covid19_ISMIR.utils.bq_fcn import bqCreateDataset, bqCreateTable, exportItems2BQ
+from covid19_ISMIR.utils.ner_fcn import loadModel, addTask, extractMedEntities
 import en_core_sci_lg
 
 import logging

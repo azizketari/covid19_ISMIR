@@ -1,7 +1,7 @@
 from google.cloud import storage, bigquery, datastore
 from google.oauth2 import service_account
-from utils.bq_fcn import returnQueryResults
-from utils.ner_fcn import getCases
+from covid19_ISMIR.utils.bq_fcn import returnQueryResults
+from covid19_ISMIR.utils.ner_fcn import getCases
 
 import logging
 import os

@@ -1,6 +1,6 @@
 from google.cloud import storage
 from google.oauth2 import service_account
-from utils.preprocessing_fcn import batch_translate_text, upload_blob
+from covid19_ISMIR.utils.preprocessing_fcn import batch_translate_text, upload_blob
 import logging
 
 import re

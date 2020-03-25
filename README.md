@@ -49,39 +49,41 @@ will automatically download a model for you and install it.
 `cd ~/covid19_ISMIR`
 
 - **Step 1:** Modify the values to each variables in env_variables.sh file then run
-
+> Assumption: You have already created/downloaded the json key to your Google Cloud Service Account. Useful [link](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-python)
 ```
 ./env_variables.sh
 ```
 
 - **Step 2:** Download the required files to your bucket and load the required model in your local  
 (this step will take ~10 min)
-
+> Optional: If you have already downloaded the scispacy model, you should modify the file ./content/download_content.sh to not repeat that step
 ```
-sh ~/data/download_content.sh
+sh ~/content/download_content.sh
 pip install -U ./scispacy_models/en_core_sci_lg-0.2.4.tar.gz
 ```
 
 - **Step 3:** Start the extraction of text from the pdf documents  
 
-`python3 extraction.py`
+`python3 ./scripts/extraction.py`
 
 ## Pre-processing data
 Following the extraction of text, it's time to translate it from Italian to English and curate it.
 
-`python3 preprocessing.py`
+`python3 ./scripts/preprocessing.py`
 
 ## Storing data
 Following the pre-processing, it's time to store the data in a more searchable format: a data warehouse - 
 [BigQuery](https://cloud.google.com/bigquery) - for the text, and a No-SQL database - 
 [Datastore](https://cloud.google.com/datastore) - for the (UMLS) medical entities. 
 
-`python3 storing.py`
+`python3 ./scripts/storing.py`
 
 ## Test
 Last but not least, you can query your databases using this script.
 
-`python3 retrieving.py`
+`python3 ./scripts/retrieving.py`
+
+---
 
 ## Contributing
 > To get started...
