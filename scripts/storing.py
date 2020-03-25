@@ -2,6 +2,8 @@ from google.cloud import storage, bigquery, datastore
 from google.oauth2 import service_account
 from utils.bq_fcn import bqCreateDataset, bqCreateTable, exportItems2BQ
 from utils.ner_fcn import loadModel, addTask, extractMedEntities
+from scispacy.umls_linking import UmlsEntityLinker
+from scispacy.abbreviation import AbbreviationDetector
 
 import logging
 logging.getLogger().setLevel(logging.INFO)

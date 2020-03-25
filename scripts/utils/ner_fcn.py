@@ -79,10 +79,10 @@ def addTask(datastore_client, doc_title, entities_dict):
     task.update(
         entities_dict
     )
-    client.put(task)
+    datastore_client.put(task)
     # Then get by key for this entity
     logging.info("Uploaded {} to Datastore.".format(doc_title))
-    return client.get(key)
+    return datastore_client.get(key)
 
 
 def getCases(datastore_client, filter_dict, limit=10):

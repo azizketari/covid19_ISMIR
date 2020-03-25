@@ -44,7 +44,10 @@ gcloud services enable bigquery.googleapis.com
 ```
 
 - Install package requirements:
- 
+> Make sure you have a python version >=3.6.0. Otherwise you will face some version errors [Useful link](https://stackoverflow.com/questions/47273260/google-cloud-compute-engine-change-to-python-3-6)
+
+`ERROR: Package 'scispacy' requires a different Python: 3.5.3 not in '>=3.6.0'`
+
 ```
 cd ~/covid19_ISMIR
 pip3 install --user -r requirements.txt
