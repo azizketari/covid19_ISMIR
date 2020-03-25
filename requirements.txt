@@ -5,5 +5,5 @@ google-cloud-datastore==1.11.0
 google-cloud-translate==2.0.1
 google-cloud-vision==1.0.0
 googleapis-common-protos==1.51.0
-pandas==1.0.1
+pandas==1.0.3
 scispacy==0.2.4

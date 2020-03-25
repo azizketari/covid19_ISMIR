@@ -1,6 +1,6 @@
 from google.cloud import storage, vision
 from google.oauth2 import service_account
-from covid19_ISMIR.utils.preprocessing_fcn import async_detect_document, read_json_result, upload_blob
+from utils.preprocessing_fcn import async_detect_document, read_json_result, upload_blob
 
 import logging
 import time
