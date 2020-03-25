@@ -1,7 +1,6 @@
 from google.cloud import storage, translate, vision
 #from google.oauth2 import service_account
 import logging
-import os
 
 from google.protobuf import json_format
 
@@ -65,10 +64,11 @@ def async_detect_document(vision_client, gcs_source_uri, gcs_destination_uri, ba
     logging.info('Text extraction from document {} is completed.'.format(doc_title))
 
 
-def read_json_result(bucket_name, doc_title, storage_client):
+def read_json_result(storage_client, bucket_name, doc_title):
     """
     Parsing the json files and extract text.
     Args:
+        storage_client:
         bucket_name:
         doc_title:
 
@@ -102,6 +102,7 @@ def upload_blob(storage_client, bucket_name, txt_content, destination_blob_name)
     """
     Uploads a file to the bucket.
     Args:
+        storage_client:
         bucket_name:
         txt_content:
         destination_blob_name:
@@ -115,15 +116,16 @@ def upload_blob(storage_client, bucket_name, txt_content, destination_blob_name)
 
     blob.upload_from_string(txt_content)
 
-    print("Text uploaded to {}".format(destination_blob_name))
+    logging.info("Text uploaded to {}".format(destination_blob_name))
 
 
-def batch_translate_text(project_id, location,
+def batch_translate_text(translate_client, project_id, location,
                          input_uri="gs://YOUR_BUCKET_ID/path/to/your/file.txt",
                          output_uri="gs://YOUR_BUCKET_ID/path/to/save/results/"):
     """
     Translates a batch of texts on GCS and stores the result in a GCS location.
     Args:
+        translate_client
         project_id:
         location:
         input_uri:

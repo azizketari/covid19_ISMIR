@@ -18,8 +18,8 @@ storage_client = storage.Client(credentials=credentials)
 
 translate_client = translate.TranslationServiceClient(credentials=credentials)
 
-lst_json_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
-                                           prefix='json')
+lst_raw_txt_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
+                                           prefix='raw_txt')
 
 customize_stop_words = [
     'uoc', 'diagnostic', 'interventional', 'radiology', 'madonna', 'delle', 'grazie', 'hospital',
@@ -33,8 +33,8 @@ customize_stop_words = [
 ]
 
 start_time = time.time()
-for blob in lst_json_blobs:
-    doc_title = blob.name.split('/')[-1].split('-')[0]
+for blob in lst_raw_txt_blobs:
+    doc_title = blob.name.split('/')[-1].split('.')[0]
 
     txt_gcs_dest_path = 'gs://' + bucket_name + '/raw_txt/' + doc_title + '.txt'
     eng_txt_gcs_dest_path = 'gs://' + bucket_name + '/eng_txt/{}/'.format(doc_title)
@@ -42,12 +42,13 @@ for blob in lst_json_blobs:
 
     # Translate raw text to english
     try:
-        batch_translate_text(project_id=project_id,
+        batch_translate_text(translate_client=translate_client,
+                             project_id=project_id,
                              location=location,
                              input_uri=txt_gcs_dest_path,
                              output_uri=eng_txt_gcs_dest_path)
         logging.info("Translation of {} document was successful.".format(doc_title))
-    except Exception, e:
+    except Exception as e:
         logging.error("Error", e)
 
     # Process eng raw text

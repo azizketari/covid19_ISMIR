@@ -24,14 +24,14 @@ datastore_client = datastore.Client(credentials=credentials)
 try:
     results_lst = returnQueryResults(bq_client, project_id, dataset_name, table_name, case_id)
     logging.info("Here is the result of the test query: \n {}".format(results_lst))
-except Exception, e:
+except Exception as e:
     logging.error("Error", e)
 
 try:
     filter_dict = {'Sign or Symptom':['onset symptoms', "chills"]}
     results = getCases(datastore_client, filter_dict, limit=10)
     logging.info("Here is the result of the test query: \n {}".format(results))
-except Exception, e:
+except Exception as e:
     logging.error("Error", e)
 
 

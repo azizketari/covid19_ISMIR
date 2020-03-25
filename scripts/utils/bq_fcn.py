@@ -123,6 +123,6 @@ def returnQueryResults(bq_client, project_id, dataset_id, table_id, case_id):
         is_exist = len(list(query_job.result())) >= 1
         logging.info('Query case id: {}'.format(case_id) if is_exist \
                          else "Case id: {} does NOT exist".format(case_id))
-        print (list(query_job.result()))
+        logging.info(list(query_job.result()))
     except Exception as e:
         logging.error("Error", e)
