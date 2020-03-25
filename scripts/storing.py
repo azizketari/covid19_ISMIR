@@ -2,9 +2,25 @@ from google.cloud import storage, bigquery, datastore
 from google.oauth2 import service_account
 from utils.bq_fcn import bqCreateDataset, bqCreateTable, exportItems2BQ
 from utils.ner_fcn import loadModel, addTask, extractMedEntities
-import en_core_sci_lg
 
 import logging
+logging.getLogger().setLevel(logging.INFO)
+
+try:
+    import en_core_sci_sm
+except:
+    logging.warning("404: en_core_sci_sm NOT FOUND. Make sure the model was downloaded and installed.")
+
+try:
+    import en_core_sci_lg
+except:
+    logging.warning("404: en_core_sci_lg NOT FOUND. Make sure the model was downloaded and installed.")
+try:
+    import en_ner_bionlp13cg_md
+except:
+    logging.warning("404: en_ner_bionlp13cg_md NOT FOUND. Make sure the model was downloaded and installed.")
+
+
 import time
 import os
 import pandas as pd
@@ -22,6 +38,8 @@ storage_client = storage.Client(credentials=credentials)
 
 datastore_client = datastore.Client(credentials=credentials)
 
+bq_client = bigquery.Client(credentials=credentials)
+
 gcs_source_prefix = 'raw_txt'
 lst_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
                                       prefix=gcs_source_prefix)
@@ -29,13 +47,13 @@ lst_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
 start_time = time.time()
 
 try:
-    dataset_id = bqCreateDataset(dataset_name)
+    dataset_id = bqCreateDataset(bq_client, dataset_name)
     logging.info("The following dataset {} was successfully created/retrieved.".format(dataset_name))
 except Exception as e:
     logging.error("An error occurred.", e)
 
 try:
-    table_id = bqCreateTable(dataset_id, table_name)
+    table_id = bqCreateTable(bq_client, dataset_id, table_name)
     logging.info("The following table {} was successfully created/retrieved.".format(table_name))
 except Exception as e:
     logging.error("An error occurred.", e)
@@ -47,9 +65,7 @@ for blob in lst_blobs:
     it_raw_blob = storage_client.get_bucket(bucket_name).get_blob('raw_txt/{}.txt'.format(doc_title))
 
     # set the GCS path
-    path_blob_eng_raw = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title,
-                                                                              bucket_name,
-                                                                              doc_title)
+    path_blob_eng_raw = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title, bucket_name, doc_title)
     eng_raw_blob = storage_client.get_bucket(bucket_name).get_blob(path_blob_eng_raw)
 
     # Upload blob of interest
@@ -57,7 +73,7 @@ for blob in lst_blobs:
         .get_blob('curated_eng_txt/{}.txt'.format(doc_title))
 
     # populate to BQ dataset
-    exportItems2BQ(dataset_id, table_id, doc_title, it_raw_blob, eng_raw_blob, curated_eng_blob)
+    exportItems2BQ(bq_client, dataset_id, table_id, doc_title, it_raw_blob, eng_raw_blob, curated_eng_blob)
 
 total_time = time.time() - start_time
 logging.info('The export to BigQuery was completed successfully and took {} minutes.'.format(round(total_time / 60, 1)))
@@ -66,7 +82,7 @@ curated_gcs_source_prefix = 'curated_eng_txt'
 lst_curated_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
                                               prefix=curated_gcs_source_prefix)
 
-nlp = loadModel(model=en_core_sci_lg)
+nlp = loadModel(model=en_core_sci_sm)
 
 start_time = time.time()
 for blob in lst_curated_blobs:

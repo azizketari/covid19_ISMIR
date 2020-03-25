@@ -2,6 +2,7 @@ from google.cloud import storage, translate
 from google.oauth2 import service_account
 from utils.preprocessing_fcn import batch_translate_text, upload_blob
 import logging
+logging.getLogger().setLevel(logging.INFO)
 
 import re
 import time
@@ -40,16 +41,15 @@ for blob in lst_raw_txt_blobs:
     eng_txt_gcs_dest_path = 'gs://' + bucket_name + '/eng_txt/{}/'.format(doc_title)
     processed_eng_gcs_dest_path = 'gs://' + bucket_name + '/curated_eng_txt/' + doc_title + '.txt'
 
-    # Translate raw text to english
-    try:
-        batch_translate_text(translate_client=translate_client,
-                             project_id=project_id,
-                             location=location,
-                             input_uri=txt_gcs_dest_path,
-                             output_uri=eng_txt_gcs_dest_path)
-        logging.info("Translation of {} document was successful.".format(doc_title))
-    except Exception as e:
-        logging.error("Error", e)
+    # Translateba raw text to english
+    #try:
+    batch_translate_text(translate_client=translate_client,
+                         project_id=project_id,
+                         input_uri=txt_gcs_dest_path,
+                         output_uri=eng_txt_gcs_dest_path)
+    logging.info("Translation of {} document was successful.".format(doc_title))
+    # except Exception as e:
+    #     logging.error("Error", e)
 
     # Process eng raw text
     blob_prefix = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title,
@@ -81,7 +81,8 @@ for blob in lst_raw_txt_blobs:
         refined_doc += ' {}'.format(word)
 
     # Upload raw text to GCS
-    upload_blob(refined_doc, processed_eng_gcs_dest_path)
+    upload_blob(storage_client=storage_client, bucket_name=bucket_name, txt_content=refined_doc,
+                destination_blob_name=processed_eng_gcs_dest_path)
     logging.info("The curation of {} text completed successfully.".format(doc_title))
 
 total_time = time.time() - start_time

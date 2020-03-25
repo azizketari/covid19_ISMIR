@@ -4,6 +4,7 @@ from utils.bq_fcn import returnQueryResults
 from utils.ner_fcn import getCases
 
 import logging
+logging.getLogger().setLevel(logging.INFO)
 import os
 
 project_id = os.getenv('PROJECT_ID')

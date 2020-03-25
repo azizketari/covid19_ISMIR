@@ -1,27 +1,13 @@
 from google.cloud import datastore
-from google.oauth2 import service_account
+
 import logging
 import re
-import os
 
-import en_core_sci_sm, en_core_sci_lg, en_ner_bionlp13cg_md
 from scispacy.umls_linking import UmlsEntityLinker
 from scispacy.abbreviation import AbbreviationDetector
 
 
-# DEVELOPER: change path to key
-# project_id = os.getenv('PROJECT_ID')
-# bucket_name = os.getenv('BUCKET_NAME')
-# location = os.getenv('LOCATION')
-# key_path = os.getenv('SA_KEY_PATH')
-
-# credentials = service_account.Credentials.from_service_account_file(key_path)
-#
-# datastore_client = datastore.Client(credentials=credentials,
-#                                     project_id=credentials.project_id)
-
-
-def loadModel(model=en_core_sci_lg):
+def loadModel(model):
     """
     Loading Named Entity Recognition model.
     Args:
@@ -77,18 +63,18 @@ def extractMedEntities(vectorized_doc):
     return UMLS_tuis_entity
 
 
-def addTask(client, doc_title, entities_dict):
+def addTask(datastore_client, doc_title, entities_dict):
     """
     Upload entities to Datastore.
     Args:
-        client:
+        datastore_client:
         doc_title:
         entities_dict:
 
     Returns:
         Datastore key object.
     """
-    key = client.key('case', doc_title)
+    key = datastore_client.key('case', doc_title)
     task = datastore.Entity(key=key)
     task.update(
         entities_dict

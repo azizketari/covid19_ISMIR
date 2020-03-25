@@ -1,26 +1,7 @@
 from google.cloud import storage, translate, vision
-#from google.oauth2 import service_account
 import logging
 
 from google.protobuf import json_format
-
-# DEVELOPER: change path to key
-# project_id = os.getenv('PROJECT_ID')
-# bucket_name = os.getenv('BUCKET_NAME')
-# location = os.getenv('LOCATION')
-# key_path = os.getenv('SA_KEY_PATH')
-
-# DEVELOPER: change path to key
-# credentials = service_account.Credentials.from_service_account_file(key_path)
-#
-# storage_client = storage.Client(credentials=credentials,
-#                                 project_id=credentials.project_id)
-#
-# translate_client = translate.Client(credentials=credentials,
-#                                     project_id=credentials.project_id)
-#
-# vision_client = vision.Client(credentials=credentials,
-#                               project_id=credentials.project_id)
 
 
 def async_detect_document(vision_client, gcs_source_uri, gcs_destination_uri, batch_size=20):
@@ -119,7 +100,7 @@ def upload_blob(storage_client, bucket_name, txt_content, destination_blob_name)
     logging.info("Text uploaded to {}".format(destination_blob_name))
 
 
-def batch_translate_text(translate_client, project_id, location,
+def batch_translate_text(translate_client, project_id,
                          input_uri="gs://YOUR_BUCKET_ID/path/to/your/file.txt",
                          output_uri="gs://YOUR_BUCKET_ID/path/to/save/results/"):
     """
@@ -127,7 +108,6 @@ def batch_translate_text(translate_client, project_id, location,
     Args:
         translate_client
         project_id:
-        location:
         input_uri:
         output_uri:
 
@@ -144,7 +124,9 @@ def batch_translate_text(translate_client, project_id, location,
     }
     gcs_destination = {"output_uri_prefix": output_uri}
     output_config = {"gcs_destination": gcs_destination}
-    parent = translate_client.location_path(project_id, location)
+
+    # Only us-central1 or global are supported location
+    parent = translate_client.location_path(project_id, location="us-central1")
 
     # Supported language codes: https://cloud.google.com/translate/docs/language
     operation = translate_client.batch_translate_text(

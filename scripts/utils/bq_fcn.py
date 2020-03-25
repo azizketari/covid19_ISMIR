@@ -1,20 +1,8 @@
 from google.cloud import bigquery
-from google.oauth2 import service_account
 import logging
-import os
-
-# project_id = os.getenv('PROJECT_ID')
-# bucket_name = os.getenv('BUCKET_NAME')
-# location = os.getenv('LOCATION')
-# key_path = os.getenv('SA_KEY_PATH')
-#
-# credentials = service_account.Credentials.from_service_account_file(key_path)
-#
-# bq_client = bigquery.Client(credentials=credentials,
-#                             project_id=project_id)
 
 
-def bqCreateDataset(dataset_name):
+def bqCreateDataset(bq_client, dataset_name):
     """
     Creates a dataset on Google Cloud Platform.
     Args:
@@ -35,7 +23,7 @@ def bqCreateDataset(dataset_name):
         return dataset.dataset_id
 
 
-def bqCreateTable(dataset_id, table_name):
+def bqCreateTable(bq_client, dataset_id, table_name):
     """
     Create main table with all cases and the medical text.
     Args:
@@ -65,7 +53,7 @@ def bqCreateTable(dataset_id, table_name):
         return table.table_id
 
 
-def exportItems2BQ(dataset_id, table_id, case, it_raw_blob, eng_raw_blob, curated_eng_blob):
+def exportItems2BQ(bq_client, dataset_id, table_id, case, it_raw_blob, eng_raw_blob, curated_eng_blob):
     """
     Export text data to BigQuery.
     Args:
