@@ -12,10 +12,10 @@ store them in a NoSQL db (namely Datastore) on Google Cloud Platform.
 [article](https://medium.com/@ak3776/covid-19-public-dataset-on-gcp-from-cases-in-italy-193e628fa5cb).**
 
 Google Cloud Architecture of the pipeline:
-![Batch mode (Streaming mode coming soon ...)](./data/images/covid19_repo_architecture_3_24_2020.png)
+![Batch mode (Streaming mode coming soon ...)](./content/images/covid19_repo_architecture_3_24_2020.png)
 
 Quick sneak peak on the Entity dataset on Datastore:
-![](./data/images/datastore_snapshot.gif)
+![](./content/images/datastore_snapshot.gif)
 
 ---
 
@@ -43,7 +43,8 @@ gcloud services enable datastore.googleapis.com
 gcloud services enable bigquery.googleapis.com
 ```
 
-- Install package requirements:
+- Install package requirements:curl -O https://bootstrap.pypa.io/get-pip.py
+sudo python3 get-pip.py
 > Make sure you have a python version >=3.6.0. Otherwise you will face some version errors [Useful link](https://stackoverflow.com/questions/47273260/google-cloud-compute-engine-change-to-python-3-6)
 
 `ERROR: Package 'scispacy' requires a different Python: 3.5.3 not in '>=3.6.0'`
