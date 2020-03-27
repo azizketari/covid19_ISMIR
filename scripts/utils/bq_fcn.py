@@ -6,6 +6,7 @@ def bqCreateDataset(bq_client, dataset_name):
     """
     Creates a dataset on Google Cloud Platform.
     Args:
+        bq_client - BigQuery client instantiation -
         dataset_name: str - Name of the dataset
     Returns:
         dataset_id: str - Reference id for the dataset just created
@@ -27,6 +28,7 @@ def bqCreateTable(bq_client, dataset_id, table_name):
     """
     Create main table with all cases and the medical text.
     Args:
+        bq_client: BigQuery client instantiation -
         dataset_id: str - Reference id for the dataset to use
         table_name: str - Name of the table to create
 
@@ -57,15 +59,16 @@ def exportItems2BQ(bq_client, dataset_id, table_id, case, it_raw_blob, eng_raw_b
     """
     Export text data to BigQuery.
     Args:
-        dataset_id:
-        table_id:
-        case:
-        it_raw_blob:
-        eng_raw_blob:
-        curated_eng_blob:
+        bq_client: BigQuery client instance -
+        dataset_id: str -
+        table_id: str -
+        case: str -
+        it_raw_blob:gcs blob object -
+        eng_raw_blob: gcs blob object -
+        curated_eng_blob: gcs blob object -
 
     Returns:
-
+        Logging completion
     """
     # Prepares a reference to the dataset
     dataset_ref = bq_client.dataset(dataset_id)
@@ -85,32 +88,97 @@ def exportItems2BQ(bq_client, dataset_id, table_id, case, it_raw_blob, eng_raw_b
                        }]
     errors = bq_client.insert_rows(table, rows_to_insert)  # API request
     assert errors == []
-    logging.info('{} was added to {} dataset, specifically in {} table.'.format(case,
-                                                                                dataset_id,
-                                                                                table_id))
+    return logging.info('{} was added to {} dataset, specifically in {} table.'.format(case,
+                                                                                       dataset_id,
+                                                                                       table_id))
 
 
-def returnQueryResults(bq_client, project_id, dataset_id, table_id, case_id):
+def constructQuery(column_lst, case_id):
+    """
+    Construct the query to public dataset: aketari-covid19-public.covid19.ISMIR
+    Args:
+        column_lst: list - ["*"] or ["column_name1", "column_name2" ...]
+        case_id: str - Optional e.g "case1"
+
+    Returns:
+        query object
+    """
+    # Public dataset
+    # project_id = 'aketari-covid19-public'
+    # dataset_id = 'covid19'
+    # table_id = 'ISMIR'
+
+    if (len(column_lst) == 1) and column_lst[0] == "*":
+        query = ('SELECT * FROM `aketari-covid19-public.covid19.ISMIR` '
+                 'WHERE `case`="{}" '.format(case_id))
+        return query
+    else:
+        columns_str = ", ".join(column_lst)
+        query = ('SELECT {} FROM `aketari-covid19-public.covid19.ISMIR` '
+                 'WHERE `case`="{}" '.format(columns_str, case_id))
+        return query
+
+
+def returnQueryResults(bq_client, query):
     """
     Get results from a BigQuery query.
     Args:
-        bq_client:
-        project_id:
-        dataset_id:
-        table_id:
-        case_id:
+        bq_client: BigQuery client instantiation -
+        query: query object
 
     Returns:
-
+        list of all rows of the query
     """
-
-    query = ('SELECT * FROM `{}.{}.{}` WHERE `case`="{}" LIMIT 1'.format(project_id, dataset_id, table_id, case_id))
 
     try:
         query_job = bq_client.query(query)
-        is_exist = len(list(query_job.result())) >= 1
-        logging.info('Query case id: {}'.format(case_id) if is_exist \
-                         else "Case id: {} does NOT exist".format(case_id))
-        logging.info(list(query_job.result()))
+        return list(query_job.result())
     except Exception as e:
-        logging.error("Error", e)
+        return logging.error("Error", e)
+
+
+def populateBQ(bq_client, storage_client, bucket_name, dataset_name, table_name):
+    """
+    Populate BigQuery dataset.
+    Args:
+        bq_client: BigQuery client instantiation -
+        storage_client:
+        bucket_name:
+        dataset_name:
+        table_name:
+
+    Returns:
+        Populated BigQuery data warehouse
+    """
+    try:
+        dataset_id = bqCreateDataset(bq_client, dataset_name)
+        logging.info("The following dataset {} was successfully created/retrieved.".format(dataset_name))
+    except Exception as e:
+        logging.error("An error occurred.", e)
+
+    try:
+        table_id = bqCreateTable(bq_client, dataset_id, table_name)
+        logging.info("The following table {} was successfully created/retrieved.".format(table_name))
+    except Exception as e:
+        logging.error("An error occurred.", e)
+
+    gcs_source_prefix = 'raw_txt'
+    lst_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
+                                          prefix=gcs_source_prefix)
+
+    for blob in lst_blobs:
+        doc_title = blob.name.split('/')[-1].split('.txt')[0]
+
+        # download as string
+        it_raw_blob = storage_client.get_bucket(bucket_name).get_blob('raw_txt/{}.txt'.format(doc_title))
+
+        # set the GCS path
+        path_blob_eng_raw = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title, bucket_name, doc_title)
+        eng_raw_blob = storage_client.get_bucket(bucket_name).get_blob(path_blob_eng_raw)
+
+        # Upload blob of interest
+        curated_eng_blob = storage_client.get_bucket(bucket_name) \
+            .get_blob('curated_eng_txt/{}.txt'.format(doc_title))
+
+        # populate to BQ dataset
+        exportItems2BQ(bq_client, dataset_id, table_id, doc_title, it_raw_blob, eng_raw_blob, curated_eng_blob)

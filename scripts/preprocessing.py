@@ -30,7 +30,8 @@ customize_stop_words = [
     'Claudia', 'Lopez', 'st', 'a.', 'a', 'of', 's', 'cien', 'ze', 'diolog', 'ic', 'he',
     'â', '€', 's', 'b', 'case', 'Cuoladi', 'l', 'c', 'ra', 'bergamo', 'patelli', 'est', 'asst',
     'dr', 'Dianluigi', 'Svizzero', 'i', 'riccardo', 'Alessandro', 'Spinazzola', 'angelo',
-    'maggiore', 'p', 'r', 't', 'm', 'en', 't', 'o', 'd', 'e', 'n', 'd', 'o', 'g', 'h', 'u'
+    'maggiore', 'p', 'r', 't', 'm', 'en', 't', 'o', 'd', 'e', 'n', 'd', 'o', 'g', 'h', 'u',
+    'man', 'female', 'D'
 ]
 
 start_time = time.time()
@@ -42,16 +43,16 @@ for blob in lst_raw_txt_blobs:
     processed_eng_gcs_dest_path = 'gs://' + bucket_name + '/curated_eng_txt/' + doc_title + '.txt'
 
     # Translateba raw text to english
-    #try:
-    batch_translate_text(translate_client=translate_client,
-                         project_id=project_id,
-                         input_uri=txt_gcs_dest_path,
-                         output_uri=eng_txt_gcs_dest_path)
-    logging.info("Translation of {} document was successful.".format(doc_title))
-    # except Exception as e:
-    #     logging.error("Error", e)
+    try:
+        batch_translate_text(translate_client=translate_client,
+                             project_id=project_id,
+                             input_uri=txt_gcs_dest_path,
+                             output_uri=eng_txt_gcs_dest_path)
+        logging.info("Translation of {} document was successful.".format(doc_title))
+    except Exception as e:
+        logging.error("Error", e)
 
-    # Process eng raw text
+    # Curate eng raw text
     blob_prefix = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title,
                                                                         bucket_name,
                                                                         doc_title)

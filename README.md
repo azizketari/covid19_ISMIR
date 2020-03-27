@@ -1,5 +1,5 @@
 # COVID-19 public dataset on GCP from cases in Italy
-> by the Italian Society of Medical and Interventional Radiology (ISMIR)
+> Medical notes and entities from TRUE patient cases publicly available on BigQuery and Datastore!
 
 This repository contains all the code required to extract relevant information from pdf documents published by ISMIR 
 and store raw data in  a relational database and entities in a No-SQL database.
@@ -27,8 +27,10 @@ You can replicate this pipeline directly on your local machine or on the cloud s
 - You need a Google Cloud project and IAM rights to create service accounts.
 - Create and Download the json key associated with your Service Account. Useful [link](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-python)
 - Modify the values to each variables in env_variables.sh file then run
+
 ```
-source env_variables.sh
+cd ./covid19_ISMIR
+source ./content/env_variables.sh
 ```
 
 - Set the project that you will be working on:
@@ -50,7 +52,6 @@ sudo python3 get-pip.py
 `ERROR: Package 'scispacy' requires a different Python: 3.5.3 not in '>=3.6.0'`
 
 ```
-cd ~/covid19_ISMIR
 pip3 install --user -r requirements.txt
 ```
 
@@ -65,10 +66,9 @@ will automatically download a model for you and install it.
 
 - **Step 1:** Download the required files to your bucket and load the required model in your local  
 (this step will take ~10 min)
-> Optional: If you have already downloaded the scispacy model, you should modify the file ./content/download_content.sh to not repeat that step
+> Optional: If you have already downloaded the scispacy models, you should modify the file ./content/download_content.sh to not repeat that step
 ```
 source ./content/download_content.sh
-pip install -U ./scispacy_models/en_core_sci_lg-0.2.4.tar.gz
 ```
 
 - **Step 2:** Start the extraction of text from the pdf documents  
@@ -85,7 +85,7 @@ Following the pre-processing, it's time to store the data in a more searchable f
 [BigQuery](https://cloud.google.com/bigquery) - for the text, and a No-SQL database - 
 [Datastore](https://cloud.google.com/datastore) - for the (UMLS) medical entities. 
 
-`python3 ./scripts/storing.py`
+`python3 ./scripts/storing.py True True [Model_of_your_choice]`
 
 ## Test
 Last but not least, you can query your databases using this script.

@@ -1,32 +1,44 @@
 from google.cloud import storage, bigquery, datastore
 from google.oauth2 import service_account
-from utils.bq_fcn import bqCreateDataset, bqCreateTable, exportItems2BQ
-from utils.ner_fcn import loadModel, addTask, extractMedEntities
-from scispacy.umls_linking import UmlsEntityLinker
-from scispacy.abbreviation import AbbreviationDetector
-
+from utils.bq_fcn import populateBQ
+from utils.ner_fcn import populateDatastore
 import logging
+import argparse
+import os
+import time
+
+# Importing the models
 logging.getLogger().setLevel(logging.INFO)
 
-try:
-    import en_core_sci_sm
-except:
-    logging.warning("404: en_core_sci_sm NOT FOUND. Make sure the model was downloaded and installed.")
+# Create the parser
+parser = argparse.ArgumentParser(description='Select the model of interest.')
 
-try:
-    import en_core_sci_lg
-except:
-    logging.warning("404: en_core_sci_lg NOT FOUND. Make sure the model was downloaded and installed.")
-try:
-    import en_ner_bionlp13cg_md
-except:
-    logging.warning("404: en_ner_bionlp13cg_md NOT FOUND. Make sure the model was downloaded and installed.")
+# Add the arguments
+parser.add_argument('store_bigquery',
+                    metavar='bool',
+                    choices=['True', 'False'],
+                    help='Store data in BigQuery. Options: True or False')
+
+parser.add_argument('store_datastore',
+                    metavar='bool',
+                    choices=['True', 'False'],
+                    help='Store data in Datastore. Options: True or False')
+
+model_choices = ['en_core_sci_sm', 'en_core_sci_lg', 'en_ner_bc5cdr_md']
+parser.add_argument('model_name',
+                    metavar='name',
+                    type=str,
+                    help='Model options: en_core_sci_sm, en_core_sci_lg, en_ner_bc5cdr_md')
+
+# Execute the parse_args() method
+args = parser.parse_args()
+if args.store_datastore == 'True' and not args.model_name:
+    parser.error('--storing in datastore can only be done when --model_name is set to a specific model.')
+elif args.store_datastore == 'True' and args.model_name not in model_choices:
+    parser.error('--storing in datastore can only be done when --model_name is among the supported models: {}.'.format(model_choices))
 
 
-import time
-import os
-import pandas as pd
-
+model_name = args['model_name']
 project_id = os.getenv('PROJECT_ID')
 bucket_name = os.getenv('BUCKET_NAME')
 location = os.getenv('LOCATION')
@@ -42,90 +54,24 @@ datastore_client = datastore.Client(credentials=credentials)
 
 bq_client = bigquery.Client(credentials=credentials)
 
-gcs_source_prefix = 'raw_txt'
-lst_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
-                                      prefix=gcs_source_prefix)
+if args.store_bigquery == 'True':
+    start_time = time.time()
+    populateBQ(bq_client=bq_client,storage_client=storage_client,
+               bucket_name=bucket_name, dataset_name=dataset_name,
+               table_name=table_name)
+    total_time = time.time() - start_time
+    logging.info(
+        'The export to BigQuery was completed successfully and took {} seconds.'.format(round(total_time, 1)))
+else:
+    logging.info('The export to BigQuery was disable.')
 
-start_time = time.time()
+if args.store_datastore == 'True':
+    start_time = time.time()
+    populateDatastore(datastore_client=datastore_client, storage_client=storage_client,
+                      bucket_name=bucket_name, model_name=model_name)
+    total_time = time.time() - start_time
+    logging.info(
+        "The export to Datastore was completed successfully and took {} seconds.".format(round(total_time, 1)))
 
-try:
-    dataset_id = bqCreateDataset(bq_client, dataset_name)
-    logging.info("The following dataset {} was successfully created/retrieved.".format(dataset_name))
-except Exception as e:
-    logging.error("An error occurred.", e)
-
-try:
-    table_id = bqCreateTable(bq_client, dataset_id, table_name)
-    logging.info("The following table {} was successfully created/retrieved.".format(table_name))
-except Exception as e:
-    logging.error("An error occurred.", e)
-
-for blob in lst_blobs:
-    doc_title = blob.name.split('/')[-1].split('.txt')[0]
-
-    # download as string
-    it_raw_blob = storage_client.get_bucket(bucket_name).get_blob('raw_txt/{}.txt'.format(doc_title))
-
-    # set the GCS path
-    path_blob_eng_raw = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title, bucket_name, doc_title)
-    eng_raw_blob = storage_client.get_bucket(bucket_name).get_blob(path_blob_eng_raw)
-
-    # Upload blob of interest
-    curated_eng_blob = storage_client.get_bucket(bucket_name) \
-        .get_blob('curated_eng_txt/{}.txt'.format(doc_title))
-
-    # populate to BQ dataset
-    exportItems2BQ(bq_client, dataset_id, table_id, doc_title, it_raw_blob, eng_raw_blob, curated_eng_blob)
-
-total_time = time.time() - start_time
-logging.info('The export to BigQuery was completed successfully and took {} minutes.'.format(round(total_time / 60, 1)))
-
-curated_gcs_source_prefix = 'curated_eng_txt'
-lst_curated_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
-                                              prefix=curated_gcs_source_prefix)
-
-nlp = loadModel(model=en_core_sci_sm)
-
-start_time = time.time()
-for blob in lst_curated_blobs:
-    doc_title = blob.name.split('/')[-1].split('.txt')[0]
-
-    # download as string
-    eng_string = blob.download_as_string().decode('utf-8')
-
-    # convert to vector
-    doc = nlp(eng_string)
-
-    # Extract medical entities
-    UMLS_tuis_entity = extractMedEntities(doc)
-
-    # Generate dataframes
-    entities = list(UMLS_tuis_entity.keys())
-    TUIs = list(UMLS_tuis_entity.values())
-    df_entities = pd.DataFrame(data={'entity': entities, 'TUIs': TUIs})
-    df_reference_TUIs = pd.read_csv('./utils/UMLS_tuis.csv')
-    df_annotated_text_entities = pd.merge(df_entities, df_reference_TUIs, how='inner', on=['TUIs'])
-
-    # Upload entities to datastore
-    entities_dict = {}
-    for idx in range(df_annotated_text_entities.shape[0]):
-        category = df_annotated_text_entities.iloc[idx].values[2]
-        med_entity = df_annotated_text_entities.iloc[idx].values[0]
-
-        # Append to list of entities if the key,value pair already exist
-        try:
-            entities_dict[category].append(med_entity)
-        except:
-            entities_dict[category] = []
-            entities_dict[category].append(med_entity)
-
-        # API call
-    key = addTask(datastore_client, doc_title, entities_dict)
-    logging.info('The upload of {} entities is done.'.format(doc_title))
-
-total_time = time.time() - start_time
-logging.info(
-    "The export to Datastore was completed successfully and took {} minutes.".format(round(total_time / 60, 1)))
-
-
-
+else:
+    logging.info('The export to Datastore was disable.')

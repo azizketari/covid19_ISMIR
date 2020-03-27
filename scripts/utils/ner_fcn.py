@@ -1,20 +1,34 @@
 from google.cloud import datastore
-
+from scispacy.umls_linking import UmlsEntityLinker
 import logging
+import pandas as pd
 import re
 
-from scispacy.umls_linking import UmlsEntityLinker
-from scispacy.abbreviation import AbbreviationDetector
+def importModel(model_name):
+    """
+    Selective import of the required model from scispacy.
+    Args:
+        model_name: str -
 
+    Returns:
+
+    """
+    if model_name == 'en_core_sci_sm':
+        import en_core_sci_sm
+    elif model_name == 'en_core_sci_lg':
+        import en_core_sci_lg
+    elif model_name == 'en_ner_bc5cdr_md':
+        import en_ner_bc5cdr_md
 
 def loadModel(model):
     """
     Loading Named Entity Recognition model.
     Args:
-        model: options: en_core_sci_sm, en_core_sci_lg, en_ner_bionlp13cg_md
+        model: options: en_core_sci_sm, en_core_sci_lg, en_ner_bc5cdr_md
 
     Returns:
         nlp: loaded model
+        linker: loaded add-on
     """
     # Load the model
     nlp = model.load()
@@ -23,19 +37,16 @@ def loadModel(model):
     linker = UmlsEntityLinker(resolve_abbreviations=True)
     nlp.add_pipe(linker)
 
-    # Add the abbreviation pipe to the spacy pipeline.
-    abbreviation_pipe = AbbreviationDetector(nlp)
-    nlp.add_pipe(abbreviation_pipe)
     logging.info("Model and add-ons successfully loaded.")
-    return nlp
+    return nlp, linker
 
 
-def extractMedEntities(vectorized_doc):
+def extractMedEntities(vectorized_doc, linker):
     """
     Returns UMLS entities contained in a text.
     Args:
         vectorized_doc:
-
+        linker:
     Returns:
         UMLS_tuis_entity: dict - key: entity and value: TUI code
     """
@@ -44,8 +55,6 @@ def extractMedEntities(vectorized_doc):
 
     UMLS_tuis_entity = {}
     entity_dict = {}
-
-    linker = UmlsEntityLinker(resolve_abbreviations=True)
 
     for idx in range(len(vectorized_doc.ents)):
         entity = vectorized_doc.ents[idx]
@@ -104,3 +113,67 @@ def getCases(datastore_client, filter_dict, limit=10):
             query.add_filter(key, '=', value)
     results = list(query.fetch(limit=limit))
     return results
+
+
+def populateDatastore(datastore_client, storage_client, bucket_name, model_name):
+    """
+    Extract UMLS entities and store them in a No-SQL db: Datastore.
+    Args:
+        datastore_client: Storage client instantiation -
+        storage_client: Storage client instantiation -
+        bucket_name: str -
+        model_name: str -
+
+    Returns:
+        Queriable database
+    """
+    curated_gcs_source_prefix = 'curated_eng_txt'
+    lst_curated_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
+                                                  prefix=curated_gcs_source_prefix)
+
+    importModel(model_name)
+
+    if model_name == 'en_core_sci_sm':
+        nlp, linker = loadModel(model=en_core_sci_sm)
+    elif model_name == 'en_core_sci_lg':
+        nlp, linker = loadModel(model=en_core_sci_lg)
+    elif model_name == 'en_ner_bc5cdr_md':
+        nlp, linker = loadModel(model=en_ner_bc5cdr_md)
+    else:
+        return False
+
+    for blob in lst_curated_blobs:
+        doc_title = blob.name.split('/')[-1].split('.txt')[0]
+
+        # download as string
+        eng_string = blob.download_as_string().decode('utf-8')
+
+        # convert to vector
+        doc = nlp(eng_string)
+
+        # Extract medical entities
+        UMLS_tuis_entity = extractMedEntities(doc, linker)
+
+        # Mapping of UMLS entities with reference csv
+        entities = list(UMLS_tuis_entity.keys())
+        TUIs = list(UMLS_tuis_entity.values())
+        df_entities = pd.DataFrame(data={'entity': entities, 'TUIs': TUIs})
+        df_reference_TUIs = pd.read_csv('./scripts/utils/UMLS_tuis.csv')
+        df_annotated_text_entities = pd.merge(df_entities, df_reference_TUIs, how='inner', on=['TUIs'])
+
+        # Upload entities to datastore
+        entities_dict = {}
+        for idx in range(df_annotated_text_entities.shape[0]):
+            category = df_annotated_text_entities.iloc[idx].values[2]
+            med_entity = df_annotated_text_entities.iloc[idx].values[0]
+
+            # Append to list of entities if the key,value pair already exist
+            try:
+                entities_dict[category].append(med_entity)
+            except:
+                entities_dict[category] = []
+                entities_dict[category].append(med_entity)
+
+            # API call
+        key = addTask(datastore_client, doc_title, entities_dict)
+        logging.info('The upload of {} entities is done.'.format(doc_title))
