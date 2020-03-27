@@ -88,7 +88,7 @@ Following the pre-processing, it's time to store the data in a more searchable f
 `python3 ./scripts/storing.py True True [Model_of_your_choice]`
 
 ## Test
-Last but not least, you can query your databases using this script.
+Last but not least, this script will run a few test cases and display the results. Feel free to modify the test cases.
 
 `python3 ./scripts/retrieving.py`
 

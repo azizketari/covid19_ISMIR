@@ -25,14 +25,21 @@ datastore_client = datastore.Client(credentials=credentials)
 try:
     query = constructQuery(column_lst=['*'], case_id='case23')
     results_lst = returnQueryResults(bq_client, query)
-    logging.info("Here is the result of the test query: \n {}".format(results_lst))
+    logging.info("Here is the result of the BigQuery test case: \n")
+    logging.info("======================================START======================================")
+    logging.info(results_lst)
+    logging.info("======================================FINISH======================================")
+
 except Exception as e:
     logging.error("Error", e)
 
 try:
-    filter_dict = {'Sign or Symptom': ['onset symptoms', "chills"]}
+    filter_dict = {'Disease or Syndrome': ['heart failure']}
     results = getCases(datastore_client, filter_dict, limit=10)
-    logging.info("Here is the result of the test query: \n {}".format(results))
+    logging.info("Here is the result of the Datastore test case: \n")
+    logging.info("======================================START======================================")
+    logging.info(results)
+    logging.info("======================================FINISH======================================")
 except Exception as e:
     logging.error("Error", e)
 
