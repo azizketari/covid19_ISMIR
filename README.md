@@ -45,8 +45,7 @@ gcloud services enable datastore.googleapis.com
 gcloud services enable bigquery.googleapis.com
 ```
 
-- Install package requirements:curl -O https://bootstrap.pypa.io/get-pip.py
-sudo python3 get-pip.py
+- Install package requirements:
 > Make sure you have a python version >=3.6.0. Otherwise you will face some version errors.
 
 `ERROR: Package 'scispacy' requires a different Python: 3.5.3 not in '>=3.6.0'`
