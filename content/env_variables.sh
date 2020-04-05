@@ -5,3 +5,5 @@ export LOCATION="compute_region"
 export BQ_DATASET_NAME="covid19"
 export BQ_TABLE_NAME="ISMIR"
 export TEST_CASE="case14" # lowercase any case from 1 to 49 (e.g case1, case32 ...)
+export RESULT_TOPIC="topic_of_choice"
+export DEST_BUCKET="name_bucket" #trigger bucket must be different than data bucket

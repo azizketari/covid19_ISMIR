@@ -45,7 +45,7 @@ def async_detect_document(vision_client, gcs_source_uri, gcs_destination_uri, ba
     logging.info('Text extraction from document {} is completed.'.format(doc_title))
 
 
-def read_json_result(storage_client, bucket_name, doc_title):
+def readJsonResult(storage_client, bucket_name, doc_title):
     """
     Parsing the json files and extract text.
     Args:
@@ -79,7 +79,7 @@ def read_json_result(storage_client, bucket_name, doc_title):
     return all_text
 
 
-def upload_blob(storage_client, bucket_name, txt_content, destination_blob_name):
+def uploadBlob(storage_client, bucket_name, txt_content, destination_blob_name):
     """
     Uploads a file to the bucket.
     Args:

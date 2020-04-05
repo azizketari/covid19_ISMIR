@@ -1,10 +1,13 @@
 google-api-core==1.16.0
 google-api-python-client==1.7.11
+google-cloud-storage==1.27.0
 google-cloud-bigquery==1.24.0
 google-cloud-datastore==1.11.0
 google-cloud-translate==2.0.1
 google-cloud-vision==1.0.0
 google-oauth2-tool==0.0.3
 googleapis-common-protos==1.51.0
+google-cloud-pubsub==1.4.2
 pandas
 scispacy
+

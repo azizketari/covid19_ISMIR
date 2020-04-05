@@ -6,7 +6,7 @@ import re
 
 def importModel(model_name):
     """
-    Selective import of the required model from scispacy.
+    Selective import of the required model from scispacy. These models are quite heavy, hence this function.
     Args:
         model_name: str -
 
@@ -115,21 +115,19 @@ def getCases(datastore_client, filter_dict, limit=10):
     return results
 
 
-def populateDatastore(datastore_client, storage_client, bucket_name, model_name):
+def populateDatastore(datastore_client, storage_client, model_name, src_bucket='aketari-covid19-data-update'):
     """
     Extract UMLS entities and store them in a No-SQL db: Datastore.
     Args:
         datastore_client: Storage client instantiation -
         storage_client: Storage client instantiation -
-        bucket_name: str -
         model_name: str -
-
+        src_bucket: str - contains pdf of the newest files
     Returns:
         Queriable database
     """
-    curated_gcs_source_prefix = 'curated_eng_txt'
-    lst_curated_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
-                                                  prefix=curated_gcs_source_prefix)
+
+    lst_curated_blobs = storage_client.list_blobs(bucket_or_name=src_bucket)
 
     importModel(model_name)
 
@@ -143,7 +141,7 @@ def populateDatastore(datastore_client, storage_client, bucket_name, model_name)
         return False
 
     for blob in lst_curated_blobs:
-        doc_title = blob.name.split('/')[-1].split('.txt')[0]
+        doc_title = blob.name.split('/')[-1].split('.pdf')[0]
 
         # download as string
         eng_string = blob.download_as_string().decode('utf-8')

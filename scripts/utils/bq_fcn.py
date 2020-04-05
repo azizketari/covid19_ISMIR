@@ -1,4 +1,5 @@
 from google.cloud import bigquery
+import os
 import logging
 
 
@@ -162,19 +163,29 @@ def populateBQ(bq_client, storage_client, bucket_name, dataset_name, table_name)
     except Exception as e:
         logging.error("An error occurred.", e)
 
-    gcs_source_prefix = 'raw_txt'
-    lst_blobs = storage_client.list_blobs(bucket_or_name=bucket_name,
+    src_bucket = os.environ['SRC_BUCKET']
+    dest_bucket = os.environ['DEST_BUCKET']
+    gcs_source_prefix = 'pdf'
+    lst_blobs = storage_client.list_blobs(bucket_or_name=src_bucket,
                                           prefix=gcs_source_prefix)
 
     for blob in lst_blobs:
         doc_title = blob.name.split('/')[-1].split('.txt')[0]
 
         # download as string
-        it_raw_blob = storage_client.get_bucket(bucket_name).get_blob('raw_txt/{}.txt'.format(doc_title))
+        it_raw_blob = storage_client.get_bucket(dest_bucket).get_blob('raw_txt/{}.txt'.format(doc_title))
 
         # set the GCS path
-        path_blob_eng_raw = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title, bucket_name, doc_title)
-        eng_raw_blob = storage_client.get_bucket(bucket_name).get_blob(path_blob_eng_raw)
+        try:
+            # Path in case using batch translation
+            path_blob_eng_raw = 'eng_txt/{}/{}_raw_txt_{}_en_translations.txt'.format(doc_title, dest_bucket, doc_title)
+            eng_raw_blob = storage_client.get_bucket(dest_bucket).get_blob(path_blob_eng_raw)
+            # If the file is not present, decoding a None Type will result in an error
+            eng_raw_txt = eng_raw_blob.download_as_string().decode('utf-8')
+        except:
+            # New path used for pdf update
+            path_blob_eng_raw = 'eng_txt/{}.txt'.format(doc_title)
+            eng_raw_blob = storage_client.get_bucket(dest_bucket).get_blob(path_blob_eng_raw)
 
         # Upload blob of interest
         curated_eng_blob = storage_client.get_bucket(bucket_name) \
