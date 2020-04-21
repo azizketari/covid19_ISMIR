@@ -20,6 +20,19 @@ Quick sneak peak on the Entity dataset on Datastore:
 ---
 
 ## Installation
+
+### Approach 1: (Semi automated)
+
+**Cloud Source Repository**
+
+- Fork this repository
+- Mirror this repository onto Cloud Source Repository (CSR) following the steps described [here](https://cloud.google.com/source-repositories/docs/mirroring-a-github-repository)
+
+Note: After you set up mirroring, Cloud Source Repositories automatically syncs your repository with the mirrored repository
+when a user commits a change. Cloud Source Repositories lets you view the last time your mirrored repository was synced
+ and manually force a sync if necessary.
+
+### Approach 2: (Manual) 
 You can replicate this pipeline directly on your local machine or on the cloud shell on GCP.
  
 **Requirements:**
@@ -63,6 +76,17 @@ will automatically download a model for you and install it.
 
 ## Extracting data
 
+### Approach 1 (Semi-automated)
+
+- **Step 1:** Create Cloud Function
+
+- Option 1: Use Cloud Source Repository (Recommended for proper version control)
+> Tips: After you mirror the repo on CSR, the repo reference name becomes github_$GITHUB_username_covid19_ismir 
+
+- Option 2: Use Inline Editor and copy paste the code (Not ideal for version control) 
+
+### Approach 2 (Manual)
+
 - **Step 1:** Download the required files to your bucket and load the required model in your local  
 (this step will take ~10 min)
 > Optional: If you have already downloaded the scispacy models, you should modify the file ./content/download_content.sh to not repeat that step
@@ -90,6 +114,7 @@ Following the pre-processing, it's time to store the data in a more searchable f
 Last but not least, this script will run a few test cases and display the results. Feel free to modify the test cases.
 
 `python3 ./scripts/retrieving.py`
+
 
 ---
 
